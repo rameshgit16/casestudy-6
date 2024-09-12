@@ -1,10 +1,10 @@
 provider "aws" {
-  region = "us-east-1" # Modify as per your region
+  region = "ap-south-1" # Modify as per your region
 }
 
 # 1. Create S3 Bucket and Policy
 resource "aws_s3_bucket" "my_bucket" {
-  bucket = "your-bucket-name"  # Change to your unique bucket name
+  bucket = "my-bucket-case-6"  # Change to your unique bucket name
   acl    = "private"
 }
 
@@ -71,7 +71,7 @@ resource "aws_vpc" "my_vpc" {
 resource "aws_subnet" "my_subnet" {
   vpc_id            = aws_vpc.my_vpc.id
   cidr_block        = "10.0.1.0/24"
-  availability_zone = "us-east-1a"
+  availability_zone = "ap-south-1a"
 }
 
 resource "aws_security_group" "ec2_sg" {
@@ -96,10 +96,10 @@ resource "aws_security_group" "ec2_sg" {
 
 # 4. Launch EC2 Instance with CloudWatch User Data
 resource "aws_instance" "ec2_instance" {
-  ami                         = "ami-xxxxxxxxxxxxxx" # Change this to your preferred AMI
+  ami                         = "ami-0c2af51e265bd5e0e" # Change this to your preferred AMI
   instance_type               = "t2.micro"
   subnet_id                   = aws_subnet.my_subnet.id
-  key_name                    = "your-key-pair"  # Replace with your key-pair name
+  key_name                    = "project pair.pem"  # Replace with your key-pair name
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.name
   security_group_ids          = [aws_security_group.ec2_sg.id]
 
