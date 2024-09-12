@@ -149,11 +149,6 @@ resource "aws_cloudwatch_log_stream" "ec2_log_stream" {
   log_group_name = aws_cloudwatch_log_group.ec2_log_group.name
 }
 
-# S3 Bucket for CloudTrail logs
-resource "aws_s3_bucket" "my_bucket" {
-  bucket = "my-bucket-case-6"
-}
-
 # S3 Bucket Policy to allow CloudTrail to write logs
 resource "aws_s3_bucket_policy" "my_bucket_policy" {
   bucket = aws_s3_bucket.my_bucket.id
