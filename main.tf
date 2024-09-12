@@ -149,7 +149,6 @@ resource "aws_cloudwatch_log_stream" "ec2_log_stream" {
   log_group_name = aws_cloudwatch_log_group.ec2_log_group.name
 }
 
-# 6. Create CloudTrail for EC2 Logging
 # S3 Bucket for CloudTrail logs
 resource "aws_s3_bucket" "my_bucket" {
   bucket = "my-bucket-case-6"
