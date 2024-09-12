@@ -5,7 +5,6 @@ provider "aws" {
 # 1. Create S3 Bucket and Policy
 resource "aws_s3_bucket" "my_bucket" {
   bucket = "my-bucket-case-6"  # Change to your unique bucket name
-  acl    = "private"
 }
 
 resource "aws_s3_bucket_policy" "bucket_policy" {
@@ -101,7 +100,7 @@ resource "aws_instance" "ec2_instance" {
   subnet_id                   = aws_subnet.my_subnet.id
   key_name                    = "project pair.pem"  # Replace with your key-pair name
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.name
-  security_group_ids          = [aws_security_group.ec2_sg.id]
+  vpc_security_group_ids = [aws_security_group.ec2_sg.id]
 
   # Install CloudWatch agent via user_data
   user_data = <<-EOF
@@ -159,13 +158,28 @@ resource "aws_cloudtrail" "ec2_trail" {
   }
 }
 
-# 7. Create VPC Endpoint for S3
+## Create a VPC Endpoint for S3
 resource "aws_vpc_endpoint" "s3_endpoint" {
   vpc_id       = aws_vpc.my_vpc.id
   service_name = "com.amazonaws.us-east-1.s3"
-  
   route_table_ids = [aws_route_table.my_route_table.id]
 }
+
+# Create a Route Table
+resource "aws_route_table" "my_route_table" {
+  vpc_id = aws_vpc.my_vpc.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.my_gw.id
+  }
+}
+
+# Internet Gateway
+resource "aws_internet_gateway" "my_gw" {
+  vpc_id = aws_vpc.my_vpc.id
+}
+
 
 # Optional Output to View Resources
 output "ec2_instance_public_ip" {
