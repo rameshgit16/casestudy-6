@@ -95,18 +95,20 @@ resource "aws_security_group" "ec2_sg" {
 
 # 4. Launch EC2 Instance with CloudWatch User Data
 resource "aws_instance" "ec2_instance" {
-  ami                         = "ami-0c2af51e265bd5e0e" # Change this to your preferred AMI
+  ami                         = "ami-0c2af51e265bd5e0e"  # Replace with your preferred AMI
   instance_type               = "t2.micro"
   subnet_id                   = aws_subnet.my_subnet.id
-  key_name                    = "project pair.pem"  # Replace with your key-pair name
+  key_name                    = "project_pair.pem"  # Replace with your key-pair name
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.name
-  vpc_security_group_ids = [aws_security_group.ec2_sg.id]
+  vpc_security_group_ids      = [aws_security_group.ec2_sg.id]
 
-  # Install CloudWatch agent via user_data
+  # Install and configure the CloudWatch agent via user_data
   user_data = <<-EOF
   #!/bin/bash
   sudo yum update -y
   sudo yum install -y amazon-cloudwatch-agent
+
+  # Create the CloudWatch agent configuration file
   cat <<EOL > /opt/aws/amazon-cloudwatch-agent/bin/config.json
   {
     "logs": {
@@ -116,14 +118,17 @@ resource "aws_instance" "ec2_instance" {
             {
               "file_path": "/var/log/messages",
               "log_group_name": "EC2LogGroup",
-              "log_stream_name": "${aws_instance.ec2_instance.id}"
+              "log_stream_name": "ec2-instance-log-stream"
             }
           ]
         }
       }
     }
   }
+  }
   EOL
+
+  # Start the CloudWatch agent
   sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
       -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json -s
   EOF
