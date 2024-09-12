@@ -98,7 +98,7 @@ resource "aws_instance" "ec2_instance" {
   ami                         = "ami-0c2af51e265bd5e0e"  # Replace with your preferred AMI
   instance_type               = "t2.micro"
   subnet_id                   = aws_subnet.my_subnet.id
-  key_name                    = "project_pair.pem"  # Replace with your key-pair name
+  key_name                    = "project pair"  # Replace with your key-pair name
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.name
   vpc_security_group_ids      = [aws_security_group.ec2_sg.id]
 
@@ -147,6 +147,46 @@ resource "aws_cloudwatch_log_group" "ec2_log_group" {
 resource "aws_cloudwatch_log_stream" "ec2_log_stream" {
   name           = "EC2LogStream"
   log_group_name = aws_cloudwatch_log_group.ec2_log_group.name
+}
+
+# 6. Create CloudTrail for EC2 Logging
+# S3 Bucket for CloudTrail logs
+resource "aws_s3_bucket" "my_bucket" {
+  bucket = "my-bucket-case-6"
+}
+
+# S3 Bucket Policy to allow CloudTrail to write logs
+resource "aws_s3_bucket_policy" "my_bucket_policy" {
+  bucket = aws_s3_bucket.my_bucket.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid       = "AWSCloudTrailAclCheck",
+        Effect    = "Allow",
+        Principal = {
+          Service = "cloudtrail.amazonaws.com"
+        },
+        Action    = "s3:GetBucketAcl",
+        Resource  = "arn:aws:s3:::${aws_s3_bucket.my_bucket.id}"
+      },
+      {
+        Sid       = "AWSCloudTrailWrite",
+        Effect    = "Allow",
+        Principal = {
+          Service = "cloudtrail.amazonaws.com"
+        },
+        Action    = "s3:PutObject",
+        Resource  = "arn:aws:s3:::${aws_s3_bucket.my_bucket.id}/AWSLogs/*",
+        Condition = {
+          StringEquals = {
+            "s3:x-amz-acl" = "bucket-owner-full-control"
+          }
+        }
+      }
+    ]
+  })
 }
 
 # 6. Create CloudTrail for EC2 Logging
