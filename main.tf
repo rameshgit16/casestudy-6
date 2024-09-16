@@ -1,10 +1,10 @@
 provider "aws" {
-  region = "ap-south-1" # Modify as per your region
+  region = "ap-south-1" 
 }
 
 # 1. Create S3 Bucket
 resource "aws_s3_bucket" "my_bucket" {
-  bucket = "my-bucket-case-6"  # Change to your unique bucket name
+  bucket = "my-bucket-case-6" 
 }
 
 # S3 Bucket Policy to allow CloudTrail to write logs
@@ -102,7 +102,7 @@ resource "aws_security_group" "ec2_sg" {
 
 # 4. Launch EC2 Instance with CloudWatch User Data
 resource "aws_instance" "ec2_instance" {
-  ami                         = "ami-0c2af51e265bd5e0e"  # Replace with your preferred AMI
+  ami                         = "ami-0c2af51e265bd5e0e" 
   instance_type               = "t2.micro"
   subnet_id                   = aws_subnet.my_subnet.id
   key_name                    = "case-6"  # Replace with your key-pair name
@@ -172,7 +172,7 @@ resource "aws_cloudtrail" "ec2_trail" {
 # 7. Create a VPC Endpoint for S3
 resource "aws_vpc_endpoint" "s3_endpoint" {
   vpc_id       = aws_vpc.my_vpc.id
-  service_name = "com.amazonaws.ap-south-1.s3"  # Update the region if necessary
+  service_name = "com.amazonaws.ap-south-1.s3"  
   route_table_ids = [aws_route_table.my_route_table.id]
 }
 
